@@ -1,0 +1,51 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+
+# Python environments
+.env
+.venv/
+venv/
+env/
+
+# Flask instance folders
+instance/
+uploads/
+
+# dotenv
+*.env
+
+# Editor settings
+.vscode/
+.idea/
+
+# Node.js
+node_modules/
+apps/web/dist/
+
+# Build
+*.log
+*.sqlite3
+*.db
+*.bak
+*.swp
+*.tmp
+
+# Migrations
+apps/api/migrations/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+*.sock
+*.tar
+*.log
+
+# Images
+*.heic
+*.png
+*.jpg
+*.jpeg
