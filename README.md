@@ -79,6 +79,53 @@ docker-compose exec backend flask db upgrade
 
 ---
 
+### Make API calls
+__pofile__: 
+ * url = http://127.0.0.1:5000/api/profile
+ * method = POST
+ * header = Content-Type: application/json
+ * body = 
+ ```json 
+    {
+      "favorite_food": "Italienisch",
+      "hobbies": "Gartenarbeit, Kochen",
+      "job": "Handwerker",
+      "color_preferences": "[\"grün\", \"braun\"]",
+      "material_preferences": "Holz, Rustikal"
+    }
+```
+__image upload__: 
+ * url = http://localhost:5000/api/upload-images
+ * method = POST
+ * header = Content-Type: multipart/form-data; boundary=<calculated when request is sent>
+ * body = 
+   * Key = user_id, Value = 1
+   * Key = images, Value = select your image 1
+   * Key = images, Value = select your image 2
+   * Key = images, Value = select your image 3
+
+__analyze environment__: 
+ * url = http://localhost:5000/api/analyze-environment
+ * method = POST
+ * header = Content-Type: application/json
+ * body = 
+ ```json 
+    {
+      "user_id": 1
+    }
+```
+__pofile__: 
+ * url = http://localhost:5000/api/analyze-objects
+ * method = POST
+ * header = Content-Type: application/json
+ * body = 
+ ```json 
+    {
+      "user_id": 1
+    }
+```
+
+
 ---
 
 ## 🧪 API Endpoints (MVP)
