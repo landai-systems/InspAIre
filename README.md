@@ -47,6 +47,7 @@ inspaire/
 │ ├── web/ # React frontend
 │ └── mobile/ # (Optional future)
 ├── services/
+│ ├── image-processing/
 │ ├── environment-detector/
 │ ├── object-detector/
 │ └── recommender/
