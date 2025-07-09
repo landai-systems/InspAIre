@@ -40,7 +40,7 @@
 ---
 
 ## 📦 Monorepo Structure
-
+```text
 inspaire/
 ├── apps/
 │ ├── api/ # Flask backend
@@ -54,6 +54,7 @@ inspaire/
 ├── infra/ # Docker, nginx, k8s
 ├── scripts/ # Build/dev scripts
 └── docker-compose.yml
+```
 
 ---
 
