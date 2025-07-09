@@ -70,6 +70,11 @@ inspaire/
 ```bash
 # Start all services
 docker-compose up --build
+
+# database migrations
+docker-compose exec backend flask db migrate -m "Add db tables"
+docker-compose exec backend flask db upgrade
+
 ```
 
 ---
