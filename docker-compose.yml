@@ -1,10 +1,13 @@
 services:
   backend:
-    build: ./apps/api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     ports:
       - "5000:5000"
     volumes:
       - ./apps/api:/app
+      - ./services:/app/services
     environment:
       - FLASK_ENV=development
       - FLASK_APP=run.py

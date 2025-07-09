@@ -2,9 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+COPY apps/api/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY apps/api /app
+COPY services /app/services
 
-CMD ["flask", "run", "--host=0.0.0.0"]
+RUN mkdir -p /app/uploads
+
+ENV PYTHONPATH="/app:/app/services"
+
+CMD ["python", "run.py"]

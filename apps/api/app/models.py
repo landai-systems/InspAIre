@@ -23,3 +23,15 @@ class ImageUpload(db.Model):
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_profile = db.relationship("UserProfile", backref="images")
+
+class AnalysisResult(db.Model):
+    __tablename__ = "analysis_results"
+
+    id = db.Column(db.Integer, primary_key=True)
+    image_id = db.Column(db.Integer, db.ForeignKey("image_uploads.id"))
+    environment = db.Column(db.String(100))
+    keywords = db.Column(db.Text)  # JSON-Array als String gespeichert
+    confidence = db.Column(db.Float)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    image = db.relationship("ImageUpload", backref="analysis_result")

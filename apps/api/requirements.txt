@@ -6,3 +6,5 @@ python-dotenv
 pillow 
 pillow-heif 
 python-magic
+openai
+python-dotenv
