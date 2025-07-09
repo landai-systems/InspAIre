@@ -13,3 +13,13 @@ class UserProfile(db.Model):
     job = db.Column(db.String(100))
     color_preferences = db.Column(db.Text)  # JSON-String: ["grün", "braun"]
     material_preferences = db.Column(db.Text)  # z.B. "Holz", "Rustikal"
+
+class ImageUpload(db.Model):
+    __tablename__ = "image_uploads"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_profile_id = db.Column(db.Integer, db.ForeignKey("user_profiles.id"))
+    filename = db.Column(db.String(255))
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user_profile = db.relationship("UserProfile", backref="images")

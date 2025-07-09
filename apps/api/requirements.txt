@@ -3,3 +3,6 @@ Flask-SQLAlchemy
 Flask-Migrate
 psycopg2-binary
 python-dotenv
+pillow 
+pillow-heif 
+python-magic
