@@ -1,11 +1,11 @@
 import os
-import sys
-import base64
 from flask import Blueprint, jsonify
 from flask import request
 from .models import db, UserProfile, ImageUpload, AnalysisResult
 from .upload_utils import allowed_file, save_and_convert_image
+from .api_utils import encode_images
 from services.environment_detector.analyze_environment import analyze_image_with_openai
+from services.object_detector.analyze_objects import analyze_objects_across_images
 
 main = Blueprint('main', __name__, url_prefix="/api")
 
@@ -72,30 +72,10 @@ def analyze_environment():
     if len(images) < 3:
         return {"error": "Need at least 3 uploaded images"}, 400
 
-    # Bilder laden und base64 kodieren
-    encoded_images = []
-    for img in images:
-        image_path = os.path.join("uploads", img.filename)
-        with open(image_path, "rb") as f:
-            encoded = base64.b64encode(f.read()).decode("utf-8")
-            encoded_images.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{encoded}"
-                }
-            })
-
-    # Profil als dict
-    profile_dict = {
-        "favorite_food": profile.favorite_food,
-        "hobbies": profile.hobbies,
-        "job": profile.job,
-        "color_preferences": profile.color_preferences,
-        "material_preferences": profile.material_preferences
-    }
+    encoded_images = encode_images(images)
 
     # Analyse via KI-Agent
-    result, content = analyze_image_with_openai(encoded_images, profile_dict)
+    result, content = analyze_image_with_openai(encoded_images)
     if not result:
         return {
             "error": "Failed to parse AI response",
@@ -114,5 +94,38 @@ def analyze_environment():
 
     return {
         "message": "Environment analysis complete",
+        "result": result
+    }, 200
+
+@main.route("/analyze-objects", methods=["POST"])
+def analyze_objects():
+    user_id = request.json.get("user_id")
+    if not user_id:
+        return {"error": "Missing user_id"}, 400
+
+    images = ImageUpload.query.filter_by(user_profile_id=user_id)\
+        .order_by(ImageUpload.uploaded_at.desc()).limit(3).all()
+
+    if len(images) < 3:
+        return {"error": "Need at least 3 uploaded images"}, 400
+
+    encoded_images = encode_images(images)
+
+    analysis = AnalysisResult.query.filter(AnalysisResult.image_id == images[0].id)\
+        .order_by(AnalysisResult.created_at.desc()).first()
+
+    if not analysis:
+        return {"error": "No prior environment analysis found"}, 400
+
+    result, content = analyze_objects_across_images(encoded_images, analysis.environment)
+    if not result:
+        return {
+            "error": "Failed to parse AI result",
+            "content": content
+        }, 500
+
+    return {
+        "message": "Object analysis complete",
+        "environment": analysis.environment,
         "result": result
     }, 200
