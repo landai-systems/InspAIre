@@ -199,7 +199,7 @@ def generate_response():
         return {"error": "No prompt found for given ID"}, 404
 
     from services.recommender.generate_response import run_final_recommendation
-    result_text = run_final_recommendation(suggestion.prompt)
+    result_text = run_final_recommendation(suggestion.prompt, environment, objects, user_profile, role)
 
     # Ergebnis speichern
     suggestion.suggestion_text = result_text
