@@ -35,3 +35,16 @@ class AnalysisResult(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     image = db.relationship("ImageUpload", backref="analysis_result")
+
+class ImprovementSuggestion(db.Model):
+    __tablename__ = "improvement_suggestions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_profile_id = db.Column(db.Integer, db.ForeignKey("user_profiles.id"))
+    prompt = db.Column(db.Text)
+    role = db.Column(db.String(100))
+    suggestion_text = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user_profile = db.relationship("UserProfile", backref="suggestions")
+    

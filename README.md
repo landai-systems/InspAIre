@@ -114,7 +114,7 @@ __analyze environment__:
       "user_id": 1
     }
 ```
-__pofile__: 
+__analyze objects__: 
  * url = http://localhost:5000/api/analyze-objects
  * method = POST
  * header = Content-Type: application/json
@@ -125,6 +125,16 @@ __pofile__:
     }
 ```
 
+__generate prompt for recommendation__: 
+ * url = http://localhost:5000/api/generate-prompt
+ * method = POST
+ * header = Content-Type: application/json
+ * body = 
+ ```json 
+    {
+      "user_id": 1
+    }
+```
 
 ---
 

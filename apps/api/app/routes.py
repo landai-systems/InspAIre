@@ -1,11 +1,12 @@
-import os
+import json
 from flask import Blueprint, jsonify
 from flask import request
-from .models import db, UserProfile, ImageUpload, AnalysisResult
+from .models import db, UserProfile, ImageUpload, AnalysisResult, ImprovementSuggestion
 from .upload_utils import allowed_file, save_and_convert_image
 from .api_utils import encode_images
 from services.environment_detector.analyze_environment import analyze_image_with_openai
 from services.object_detector.analyze_objects import analyze_objects_across_images
+
 
 main = Blueprint('main', __name__, url_prefix="/api")
 
@@ -128,4 +129,86 @@ def analyze_objects():
         "message": "Object analysis complete",
         "environment": analysis.environment,
         "result": result
+    }, 200
+
+@main.route("/generate-prompt", methods=["POST"])
+def generate_prompt():
+    user_id = request.json.get("user_id")
+    if not user_id:
+        return {"error": "Missing user_id"}, 400
+
+    profile = UserProfile.query.get(user_id)
+    analysis = AnalysisResult.query\
+        .join(ImageUpload)\
+        .filter(ImageUpload.user_profile_id == user_id)\
+        .order_by(AnalysisResult.created_at.desc()).first()
+
+    if not analysis:
+        return {"error": "No analysis found"}, 404
+
+    objects = None
+    try:
+        objects = analysis.keywords
+    except:
+        return {
+            "error": "AnalysisResult query failed",
+        }, 500
+
+    profile_dict = {
+        "favorite_food": profile.favorite_food,
+        "hobbies": profile.hobbies,
+        "job": profile.job,
+        "color_preferences": profile.color_preferences,
+        "material_preferences": profile.material_preferences
+    }
+
+    from services.recommender.generate_prompt import determine_role_and_prompt
+    prompt_info, content = determine_role_and_prompt(analysis.environment, objects, profile_dict)
+
+    if not prompt_info:
+        return {
+            "error": "Prompt generation failed",
+            "content": content
+        }, 500
+
+    # Prompt speichern
+    suggestion = ImprovementSuggestion(
+        user_profile_id=user_id,
+        prompt=prompt_info["prompt"],
+        role=prompt_info["role"],
+        suggestion_text=None
+    )
+    db.session.add(suggestion)
+    db.session.commit()
+
+    return {
+        "message": "Prompt generated",
+        "suggestion_id": suggestion.id,
+        "role": prompt_info["role"],
+        "prompt": prompt_info["prompt"]
+    }, 200
+
+@main.route("/generate-response", methods=["POST"])
+def generate_response():
+    suggestion_id = request.json.get("suggestion_id")
+    if not suggestion_id:
+        return {"error": "Missing suggestion_id"}, 400
+
+    suggestion = ImprovementSuggestion.query.get(suggestion_id)
+    if not suggestion or not suggestion.prompt:
+        return {"error": "No prompt found for given ID"}, 404
+
+    from services.recommender.generate_response import run_final_recommendation
+    result_text = run_final_recommendation(suggestion.prompt)
+
+    # Ergebnis speichern
+    suggestion.suggestion_text = result_text
+    db.session.commit()
+
+    return {
+        "message": "Suggestion generated",
+        "suggestion_id": suggestion.id,
+        "role": suggestion.role,
+        "prompt": suggestion.prompt,
+        "result": result_text
     }, 200

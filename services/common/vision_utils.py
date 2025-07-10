@@ -26,6 +26,9 @@ def call_openai_vision(messages: list, max_tokens=800, temperature=0.4):
         max_tokens=max_tokens,
         temperature=temperature
     )
+    return parse_openai_response_json(response)
+
+def parse_openai_response_json(response):
     content = response.choices[0].message.content
     try:
         content = content.split("```json")[1].split("```")[0].strip()
