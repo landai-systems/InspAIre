@@ -13,6 +13,7 @@ class UserProfile(db.Model):
     job = db.Column(db.String(100))
     color_preferences = db.Column(db.Text)  # JSON-String: ["grün", "braun"]
     material_preferences = db.Column(db.Text)  # z.B. "Holz", "Rustikal"
+    abo_state = db.Column(db.String(100)) # Abo Status z.B. free, pro, premium
 
 class ImageUpload(db.Model):
     __tablename__ = "image_uploads"

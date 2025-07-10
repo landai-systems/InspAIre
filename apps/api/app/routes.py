@@ -23,7 +23,8 @@ def create_profile():
         hobbies=data.get("hobbies"),
         job=data.get("job"),
         color_preferences=data.get("color_preferences"),
-        material_preferences=data.get("material_preferences")
+        material_preferences=data.get("material_preferences"),
+        abo_state=data.get("abo_state")
     )
 
     db.session.add(profile)
@@ -190,16 +191,45 @@ def generate_prompt():
 
 @main.route("/generate-response", methods=["POST"])
 def generate_response():
-    suggestion_id = request.json.get("suggestion_id")
-    if not suggestion_id:
-        return {"error": "Missing suggestion_id"}, 400
+    user_id = request.json.get("user_id")
+    if not user_id:
+        return {"error": "Missing user_id"}, 400
+    
+    profile = UserProfile.query.get(user_id)
+    analysis = AnalysisResult.query\
+        .join(ImageUpload)\
+        .filter(ImageUpload.user_profile_id == user_id)\
+        .order_by(AnalysisResult.created_at.desc()).first()
 
-    suggestion = ImprovementSuggestion.query.get(suggestion_id)
+    if not analysis:
+        return {"error": "No analysis found"}, 404
+
+    objects = None
+    try:
+        objects = analysis.keywords
+    except:
+        return {
+            "error": "AnalysisResult query failed",
+        }, 500
+
+    profile_dict = {
+        "favorite_food": profile.favorite_food,
+        "hobbies": profile.hobbies,
+        "job": profile.job,
+        "color_preferences": profile.color_preferences,
+        "material_preferences": profile.material_preferences
+    }
+
+    suggestion = ImprovementSuggestion.query\
+        .filter(ImprovementSuggestion.user_profile_id == user_id)\
+        .order_by(ImprovementSuggestion.created_at.desc()).first()
+    
     if not suggestion or not suggestion.prompt:
-        return {"error": "No prompt found for given ID"}, 404
+        return {"error": "No prompt found for given user_id"}, 404
 
     from services.recommender.generate_response import run_final_recommendation
-    result_text = run_final_recommendation(suggestion.prompt, environment, objects, user_profile, role)
+    result_text = run_final_recommendation(suggestion.prompt, environment=analysis.environment, 
+                                           objects=objects, user_profile=profile_dict, role=suggestion.role)
 
     # Ergebnis speichern
     suggestion.suggestion_text = result_text

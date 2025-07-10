@@ -91,7 +91,8 @@ __pofile__:
       "hobbies": "Gartenarbeit, Kochen",
       "job": "Handwerker",
       "color_preferences": "[\"grün\", \"braun\"]",
-      "material_preferences": "Holz, Rustikal"
+      "material_preferences": "Holz, Rustikal",
+      "abo_state": "premium"
     }
 ```
 __image upload__: 
@@ -127,6 +128,17 @@ __analyze objects__:
 
 __generate prompt for recommendation__: 
  * url = http://localhost:5000/api/generate-prompt
+ * method = POST
+ * header = Content-Type: application/json
+ * body = 
+ ```json 
+    {
+      "user_id": 1
+    }
+```
+
+__generate response for recommendation__: 
+ * url = http://localhost:5000/api/generate-response
  * method = POST
  * header = Content-Type: application/json
  * body = 
