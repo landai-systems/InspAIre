@@ -147,17 +147,6 @@ __generate response for recommendation__:
       "user_id": 1
     }
 ```
-
----
-
-## 🧪 API Endpoints (MVP)
-
-| Method | Endpoint             | Description                        |
-|--------|----------------------|------------------------------------|
-| POST   | `/api/profile`       | Create user profile                |
-| POST   | `/api/upload-images` | Upload 3 images for analysis       |
-| GET    | `/api/analysis/:id`  | Get personalized AI suggestion     |
-
 ---
 
 ## 🤝 Contributing
@@ -177,6 +166,19 @@ We welcome contributions! To get started:
 - Backend: PEP8 + Flake8
 - Frontend: ESLint + Prettier
 - Use meaningful commit messages (Conventional Commits recommended)
+
+---
+
+## Planned Features
+* [ ] RAG for realistic recommendations based on user situation (IKEA catalog, food blogs, etc.)
+* [ ] Modern and nice frontend with react and typescript for __web__ 
+* [ ] Modern and nice frontend with react-native for __mobile__
+* [ ] Extend frontend with user session managment
+* [ ] Improve API in backend for authentification
+* [ ] Improve API security 
+* [ ] Improve data model (relations) and API routes (retrievel by object ids) -> user can search and read old analysis and images/photos
+* [ ] Implement a recommendation response as generated image based on recommendation text and uploaded image(s) as premium feature
+* [ ] Brain storming for features as pro and premium features
 
 ---
 
